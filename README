@@ -1,0 +1,47 @@
+DNS GateWay (dns-gw)
+
+DNS GateWay provides a simple programmable dns service by invoking a
+shell script provided by the administrator to lookup addresses.
+
+For each dns query received on the udp port, dns-gw invokes the script
+with the name, class and type from the query as command line arguments.
+The script should write out the relevant IP addresses to standard output
+in presentation format (ascii) - one address per line, and then exit.
+Addresses should match the type specified in the arguments, i.e.  IPv4
+for 'A' and IPv6 for 'AAAA'.
+
+A slightly more sophisticated configuration can be achieved by
+specifying a directory rather than an individual script.  dns-gw will
+search this directory for a script matching the name being queried or as
+much of the domain name as possible. Queries which have no match will
+be ignored so as not to invite re-tries.
+
+There is a time limit of 3 seconds on each invocation of the script,
+after which, dns-gw will attempt to terminate the process. If desired,
+compiled executable programs may be used instead of shell scripts.
+
+
+Invoking: dns-gw requires two parameters; the udp port number and the
+path for the script or directory of scripts, as follows:
+
+	$ dns-gw <port> <script path>
+
+
+Directives: dns-gw also understands the following directives in the
+output of the shell script (each must be on a separate line which starts
+with a '$' sign). Directives are not case sensitive.
+
+	$ttl (seconds)
+	Sets the time-to-live of any subsequent addresses provided.
+
+	$cname (cname)
+	Treats the queried name as an alias and provides the canonical
+	name for it. This must be output before any IP addresses.
+
+	$return (code)
+	Specifies an explicit return code for dns-gw to respond with
+	for this query. (code) can be any of 'noerror', 'formerr',
+	'servfail', 'nxdomain', 'notimp', 'refused' or the actual
+	numeric value (0 - 15).  All addresses will be discarded where
+	the return code is non-zero.
+
