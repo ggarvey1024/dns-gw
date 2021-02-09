@@ -1,6 +1,6 @@
 #define MAJOR_VERSION 1
 #define MINOR_VERSION 0
-#define RELEASE "-rc3"
+#define RELEASE "-2"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -682,8 +682,7 @@ static void process_request(int skt)
 	job->query = query;
 	job->start = get_timer();
 	job->question = job->query->questions;
-	if (job->question)
-		job->ref = &job->question->offset;
+	job->ref = &job->question->offset;
 	job->pipe = -1;
 	job->ttl = sys_ttl;
 
